@@ -44,12 +44,15 @@ const students = [
 ]
 
 const typeDefs = gql`
+    type Address {
+        city: String!
+        country: String!
+    }
     type Student {
         name: String!
         phone: String
         age: String!
-        city: String
-        country: String
+        address: Address!
     }
 
     type Query {
@@ -66,6 +69,15 @@ const resolvers = {
         findStudent: (root, args) => {
             const {name} = args
             return students.find(student => student.name === name)
+        }
+    },
+
+    Student: {
+        address: (root) => {
+            return {
+                city: root.city,
+                country: root.country
+            } 
         }
     }
 }
