@@ -1,4 +1,5 @@
 import {ApolloServer, gql} from 'apollo-server'
+import {v1 as uuid} from 'uuid'
 
 const students = [
     {
@@ -52,6 +53,7 @@ const typeDefs = gql`
         name: String!
         phone: String
         age: String!
+        birthday: String
         address: Address!
     }
 
@@ -59,6 +61,17 @@ const typeDefs = gql`
         studentCount: Int!
         allStudents: [Student]!
         findStudent(name: String!): Student
+    }
+
+    type Mutation {
+        addStudent(
+            name: String!
+            phone: String
+            age: String!
+            birthday: String
+            city: String!
+            country: String!
+        ): Student
     }
 `
 
@@ -69,6 +82,17 @@ const resolvers = {
         findStudent: (root, args) => {
             const {name} = args
             return students.find(student => student.name === name)
+        }
+    },
+
+    Mutation: {
+        addStudent: (root, args) => {
+            if (students.find(p => p.name === args.name)) {
+                throw new Error("Name must be unique")
+            }
+            const student = {... args, id: uuid()}
+            students.push(student)  //update "database" with new student
+            return student
         }
     },
 
